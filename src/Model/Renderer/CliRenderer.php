@@ -3,43 +3,22 @@ namespace Nagoya\Dk9\Model\Renderer;
 
 use Nagoya\Dk9\Model\Node;
 use Nagoya\Dk9\Model\NodeRenderer;
-use Nagoya\Dk9\Model\RootNode;
 
 class CliRenderer extends NodeRenderer
 {
     /**
-     * @param Node $node
-     * @param null $depth
-     * @return mixed|string
+     * @inheritdoc
      */
-    public function render(Node $node, $depth = null)
+    protected function formatCollection($content)
     {
-        if ($node instanceof RootNode) {
-            return $this->renderChildren($node, $depth);
-        } else {
-            $buf = str_repeat('  ', $depth);
-            $buf .= '* ' . $node->name . PHP_EOL;
-            if ($childBuf = $this->renderChildren($node, $depth + 1)) {
-                $buf .= $childBuf;
-            }
-
-            return $buf;
-        }
+        return $content;
     }
 
     /**
-     * @param $node
-     * @param $depth
-     * @return mixed
+     * @inheritdoc
      */
-    private function renderChildren($node, $depth)
+    protected function formatNode(Node $node, $childContent, $depth)
     {
-        $childBuf = array_reduce($node->children, function ($current, Node $node) use ($depth) {
-            return $current . $this->render($node, $depth);
-        }, '');
-
-        if ($childBuf) {
-            return $childBuf;
-        }
+        return sprintf('%s* %s' . PHP_EOL . '%s', str_repeat('  ', $depth), $node->name, $childContent);
     }
 }

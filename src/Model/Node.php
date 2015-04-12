@@ -19,12 +19,14 @@ class Node
     public $parentId;
 
     /**
-     * @var Node[]
+     * @var NodeCollection
      */
-    public $children = [];
+    public $children;
 
     public function __construct($id, $name, $parentId)
     {
+        $this->children = new NodeCollection();
+
         $this->id = $id;
         $this->name = $name;
         $this->parentId = $parentId;
@@ -35,6 +37,6 @@ class Node
      */
     public function addChildNode(Node $node)
     {
-        $this->children[] = $node;
+        $this->children->addNode($node);
     }
 }

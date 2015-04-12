@@ -2,9 +2,9 @@
 namespace Nagoya\Dk9;
 
 use Nagoya\Dk9\Model\Node;
+use Nagoya\Dk9\Model\NodeCollection;
 use Nagoya\Dk9\Model\NodeRenderer;
 use Nagoya\Dk9\Model\NodeRepository;
-use Nagoya\Dk9\Model\RootNode;
 
 class Dk9
 {
@@ -26,23 +26,21 @@ class Dk9
 
     public function solve($data)
     {
-        $rootNode = $this->initRootNode();
+        $rootNodeCollection = $this->initRootNodeCollection();
         $this->parseData($data);
-        $this->buildTree($rootNode);
+        $this->buildTree($rootNodeCollection);
 
-        return $this->renderer->render($rootNode, 0);
+        return $this->renderer->renderCollection($rootNodeCollection, 0);
     }
 
     /**
-     * ルートノード初期化
-     * @return RootNode
+     * ルートノードコレクション初期化
+     * @return NodeCollection
      */
-    private function initRootNode()
+    private function initRootNodeCollection()
     {
-        $rootNode = new RootNode(0, '', null);
-        $this->repository->add($rootNode);
-
-        return $rootNode;
+        $rootNodeCollection = new NodeCollection();
+        return $rootNodeCollection;
     }
 
     /**
@@ -60,14 +58,17 @@ class Dk9
 
     /**
      * 木構造への整形
+     * @param NodeCollection $rootNodeCollection
      */
-    private function buildTree()
+    private function buildTree(NodeCollection $rootNodeCollection)
     {
         foreach ($this->repository->findAll() as $node)
         {
             $parent = $this->repository->findOneById($node->parentId);
             if ($parent) {
                 $parent->addChildNode($node);
+            } else {
+                $rootNodeCollection->addNode($node);
             }
         }
     }
